@@ -9,6 +9,8 @@ import (
 	"github.com/damonkelley/dm-hostsupdater/machine"
 )
 
+const entryTemplate string = "\n%s\t%s\t# %s"
+
 type Hostsfile struct {
 	Filename string
 	File     *os.File
@@ -36,7 +38,7 @@ func (h Hostsfile) AddHostsEntry(machine machine.Machine) {
 	// Go the end of the file to append the new host entry.
 	h.File.Seek(0, 2)
 
-	entry := fmt.Sprintf("\n%s\t%s\t# %s", machine.IP, machine.Hostname, machine.Id)
+	entry := fmt.Sprintf(entryTemplate, machine.IP, machine.Hostname, machine.Id)
 
 	if _, err := h.File.WriteString(entry); err != nil {
 		handleError(err)
