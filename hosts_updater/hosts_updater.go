@@ -30,11 +30,11 @@ func NewHostsfile(filename string) Hostsfile {
 	return Hostsfile{filename, f}
 }
 
-func (h Hostsfile) Close() error {
+func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
-func (h Hostsfile) AddHostsEntry(machine machine.Machine) {
+func (h *Hostsfile) AddHostsEntry(machine machine.Machine) {
 	// Go the end of the file to append the new host entry.
 	h.File.Seek(0, 2)
 
@@ -45,7 +45,7 @@ func (h Hostsfile) AddHostsEntry(machine machine.Machine) {
 	}
 }
 
-func (h Hostsfile) RemoveHostsEntry(machine machine.Machine) {
+func (h *Hostsfile) RemoveHostsEntry(machine machine.Machine) {
 	h.File.Seek(0, 0)
 
 	f, err := ioutil.ReadAll(h.File)
