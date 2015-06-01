@@ -7,15 +7,15 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/damonkelley/dm-hostsupdater/machine"
+	"github.com/damonkelley/hostsup/host"
 )
 
 func TestAddHostsEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
-	machine := machine.NewMachine(hostname, ip)
+	host := host.NewHost(hostname, ip)
 
 	h := NewHostsfile("testdata/hosts")
-	h.AddHostsEntry(machine)
+	h.AddHostsEntry(host)
 
 	f, _ := os.Open("testdata/hosts")
 	defer f.Close()
@@ -33,10 +33,10 @@ func TestAddHostsEntry(t *testing.T) {
 
 func TestRemoveHostsEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
-	machine := machine.NewMachine(hostname, ip)
+	host := host.NewHost(hostname, ip)
 
 	h := NewHostsfile("testdata/hosts")
-	h.RemoveHostsEntry(machine)
+	h.RemoveHostsEntry(host)
 
 	f, _ := os.Open("testdata/hosts")
 	defer f.Close()

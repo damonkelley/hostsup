@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/damonkelley/dm-hostsupdater/machine"
+	"github.com/damonkelley/hostsup/host"
 )
 
 const entryTemplate string = "\n%s\t%s\t# %s"
@@ -34,18 +34,18 @@ func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
-func (h *Hostsfile) AddHostsEntry(machine machine.Machine) {
+func (h *Hostsfile) AddHostsEntry(host host.Host) {
 	// Go the end of the file to append the new host entry.
 	h.File.Seek(0, 2)
 
-	entry := fmt.Sprintf(entryTemplate, machine.IP, machine.Hostname, machine.Id)
+	entry := fmt.Sprintf(entryTemplate, host.IP, host.Hostname, host.Id)
 
 	if _, err := h.File.WriteString(entry); err != nil {
 		handleError(err)
 	}
 }
 
-func (h *Hostsfile) RemoveHostsEntry(machine machine.Machine) {
+func (h *Hostsfile) RemoveHostsEntry(host host.Host) {
 	h.File.Seek(0, 0)
 
 	f, err := ioutil.ReadAll(h.File)
@@ -58,7 +58,7 @@ func (h *Hostsfile) RemoveHostsEntry(machine machine.Machine) {
 	updatedLines := []string{}
 
 	for _, line := range lines {
-		if !strings.Contains(line, machine.Id) {
+		if !strings.Contains(line, host.Id) {
 			updatedLines = append(updatedLines, line)
 		}
 	}
