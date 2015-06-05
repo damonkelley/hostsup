@@ -1,15 +1,18 @@
 package hosts_updater
 
 import (
+	"encoding/csv"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/damonkelley/hostsup/host"
 )
 
-const entryTemplate string = "\n%s\t%s\t# %s"
+const entryTemplate string = "\n%s\t%s\t# HOSTSUP %s"
+const entryTag string = "HOSTSUP"
 
 type Hostsfile struct {
 	Filename string
@@ -70,4 +73,32 @@ func (h *Hostsfile) RemoveHostsEntry(host host.Host) {
 	if err != nil {
 		handleError(err)
 	}
+}
+
+func (h *Hostsfile) ListHostsEntries() []host.Host {
+	h.File.Seek(0, 0)
+
+	reader := csv.NewReader(h.File)
+	tab, _ := utf8.DecodeRuneInString("\t")
+	comment, _ := utf8.DecodeRuneInString("#")
+
+	reader.Comma = tab
+	reader.Comment = comment
+	reader.FieldsPerRecord = -1
+
+	lines, _ := reader.ReadAll()
+
+	hosts := []host.Host{}
+
+	for _, line := range lines {
+		// TODO: Add a check to determine if the entry was added by hostsup
+		if len(line) >= 3 {
+			// TODO: See if we can unpack the list to create the Host
+			// host.NewHost(line...)
+			host := host.NewHost(line[1], line[0])
+			hosts = append(hosts, host)
+		}
+	}
+
+	return hosts
 }
