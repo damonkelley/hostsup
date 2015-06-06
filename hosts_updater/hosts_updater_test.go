@@ -92,3 +92,26 @@ func TestListEntries(t *testing.T) {
 		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
 	}
 }
+
+func TestClean(t *testing.T) {
+	hostname1, ip1 := "dev1.dev", "192.168.0.1"
+	host1 := NewHost(hostname1, ip1)
+
+	hostname2, ip2 := "dev2.dev", "192.168.0.2"
+	host2 := NewHost(hostname2, ip2)
+
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+
+	h.AddEntry(host1)
+	h.AddEntry(host2)
+
+	h.Clean()
+	hosts := h.ListEntries()
+
+	if len(hosts) != 0 {
+		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
+	}
+}

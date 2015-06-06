@@ -102,3 +102,13 @@ func (h *Hostsfile) ListEntries() []Host {
 
 	return hosts
 }
+
+func (h *Hostsfile) Clean() []Host {
+	entries := h.ListEntries()
+
+	for _, entry := range entries {
+		h.RemoveEntry(entry)
+	}
+
+	return entries
+}
