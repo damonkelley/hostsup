@@ -7,8 +7,6 @@ import (
 	"os"
 	"strings"
 	"unicode/utf8"
-
-	"github.com/damonkelley/hostsup/host"
 )
 
 const entryTemplate string = "\n%s\t%s\t# HOSTSUP %s"
@@ -37,7 +35,9 @@ func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
-func (h *Hostsfile) AddHostsEntry(host host.Host) {
+func (h *Hostsfile) AddHostsEntry(host Host) {
+	defer h.File.Seek(0, 0)
+
 	// Go the end of the file to append the new host entry.
 	h.File.Seek(0, 2)
 
@@ -48,8 +48,8 @@ func (h *Hostsfile) AddHostsEntry(host host.Host) {
 	}
 }
 
-func (h *Hostsfile) RemoveHostsEntry(host host.Host) {
-	h.File.Seek(0, 0)
+func (h *Hostsfile) RemoveHostsEntry(host Host) {
+	defer h.File.Seek(0, 0)
 
 	f, err := ioutil.ReadAll(h.File)
 
@@ -75,8 +75,8 @@ func (h *Hostsfile) RemoveHostsEntry(host host.Host) {
 	}
 }
 
-func (h *Hostsfile) ListHostsEntries() []host.Host {
-	h.File.Seek(0, 0)
+func (h *Hostsfile) ListHostsEntries() []Host {
+	defer h.File.Seek(0, 0)
 
 	reader := csv.NewReader(h.File)
 	tab, _ := utf8.DecodeRuneInString("\t")
@@ -88,14 +88,14 @@ func (h *Hostsfile) ListHostsEntries() []host.Host {
 
 	lines, _ := reader.ReadAll()
 
-	hosts := []host.Host{}
+	hosts := []Host{}
 
 	for _, line := range lines {
 		// TODO: Add a check to determine if the entry was added by hostsup
 		if len(line) >= 3 {
 			// TODO: See if we can unpack the list to create the Host
 			// host.NewHost(line...)
-			host := host.NewHost(line[1], line[0])
+			host := NewHost(line[1], line[0])
 			hosts = append(hosts, host)
 		}
 	}
