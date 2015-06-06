@@ -9,10 +9,10 @@ type Host struct {
 	Id, Hostname, IP string
 }
 
-func NewHost(hostname, ip string) Host {
+func NewHost(hostname, ip string) *Host {
 	id := createHostId(hostname)
 
-	return Host{id, hostname, ip}
+	return &Host{id, hostname, ip}
 }
 
 func createHostId(hostname string) string {

@@ -21,21 +21,21 @@ func handleError(err error) {
 	panic(err)
 }
 
-func NewHostsfile(filename string) Hostsfile {
+func NewHostsfile(filename string) *Hostsfile {
 	f, err := os.OpenFile(filename, os.O_RDWR, 0666)
 
 	if err != nil {
 		handleError(err)
 	}
 
-	return Hostsfile{filename, f}
+	return &Hostsfile{filename, f}
 }
 
 func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
-func (h *Hostsfile) AddEntry(host Host) {
+func (h *Hostsfile) AddEntry(host *Host) {
 	defer h.File.Seek(0, 0)
 
 	// Go the end of the file to append the new host entry.
@@ -48,7 +48,7 @@ func (h *Hostsfile) AddEntry(host Host) {
 	}
 }
 
-func (h *Hostsfile) RemoveEntry(host Host) {
+func (h *Hostsfile) RemoveEntry(host *Host) {
 	defer h.File.Seek(0, 0)
 
 	f, err := ioutil.ReadAll(h.File)
@@ -75,7 +75,7 @@ func (h *Hostsfile) RemoveEntry(host Host) {
 	}
 }
 
-func (h *Hostsfile) ListEntries() []Host {
+func (h *Hostsfile) ListEntries() []*Host {
 	defer h.File.Seek(0, 0)
 
 	reader := csv.NewReader(h.File)
@@ -88,7 +88,7 @@ func (h *Hostsfile) ListEntries() []Host {
 
 	lines, _ := reader.ReadAll()
 
-	hosts := []Host{}
+	hosts := []*Host{}
 
 	for _, line := range lines {
 		// TODO: Add a check to determine if the entry was added by hostsup
@@ -103,7 +103,7 @@ func (h *Hostsfile) ListEntries() []Host {
 	return hosts
 }
 
-func (h *Hostsfile) Clean() []Host {
+func (h *Hostsfile) Clean() []*Host {
 	entries := h.ListEntries()
 
 	for _, entry := range entries {
