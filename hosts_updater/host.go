@@ -1,4 +1,4 @@
-package host
+package hosts_updater
 
 import (
 	"crypto/md5"
