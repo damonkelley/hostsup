@@ -3,23 +3,42 @@ package hosts_updater
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
-
-	"github.com/damonkelley/hostsup/host"
 )
+
+func createTestHostsFile() (*os.File, error) {
+	f, err := ioutil.TempFile("testdata", "hosts-")
+
+	if err != nil {
+		return nil, err
+	}
+
+	contents, _ := ioutil.ReadFile("testdata/hosts")
+
+	f.Write(contents)
+	f.Seek(0, 0)
+
+	return f, nil
+}
+
+func remove(f *os.File) error {
+	return os.Remove(f.Name())
+}
 
 func TestAddHostsEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
-	host := host.NewHost(hostname, ip)
+	host := NewHost(hostname, ip)
 
-	h := NewHostsfile("testdata/hosts")
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
 	h.AddHostsEntry(host)
 
-	f, _ := os.Open("testdata/hosts")
-	defer f.Close()
-
+	// Reset the offset after AddHostsEntry changes it.
 	scanner := bufio.NewScanner(f)
 
 	for scanner.Scan() {
@@ -33,13 +52,13 @@ func TestAddHostsEntry(t *testing.T) {
 
 func TestRemoveHostsEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
-	host := host.NewHost(hostname, ip)
+	host := NewHost(hostname, ip)
 
-	h := NewHostsfile("testdata/hosts")
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
 	h.RemoveHostsEntry(host)
-
-	f, _ := os.Open("testdata/hosts")
-	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
 
@@ -54,12 +73,16 @@ func TestRemoveHostsEntry(t *testing.T) {
 
 func TestListHostsEntries(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
-	host1 := host.NewHost(hostname1, ip1)
+	host1 := NewHost(hostname1, ip1)
 
 	hostname2, ip2 := "dev2.dev", "192.168.0.2"
-	host2 := host.NewHost(hostname2, ip2)
+	host2 := NewHost(hostname2, ip2)
 
-	h := NewHostsfile("testdata/hosts")
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+
 	h.AddHostsEntry(host1)
 	h.AddHostsEntry(host2)
 
