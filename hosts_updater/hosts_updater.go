@@ -35,7 +35,7 @@ func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
-func (h *Hostsfile) AddHostsEntry(host Host) {
+func (h *Hostsfile) AddEntry(host Host) {
 	defer h.File.Seek(0, 0)
 
 	// Go the end of the file to append the new host entry.
@@ -48,7 +48,7 @@ func (h *Hostsfile) AddHostsEntry(host Host) {
 	}
 }
 
-func (h *Hostsfile) RemoveHostsEntry(host Host) {
+func (h *Hostsfile) RemoveEntry(host Host) {
 	defer h.File.Seek(0, 0)
 
 	f, err := ioutil.ReadAll(h.File)
@@ -75,7 +75,7 @@ func (h *Hostsfile) RemoveHostsEntry(host Host) {
 	}
 }
 
-func (h *Hostsfile) ListHostsEntries() []Host {
+func (h *Hostsfile) ListEntries() []Host {
 	defer h.File.Seek(0, 0)
 
 	reader := csv.NewReader(h.File)

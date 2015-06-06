@@ -36,7 +36,7 @@ func TestAddHostsEntry(t *testing.T) {
 	defer remove(f)
 
 	h := Hostsfile{f.Name(), f}
-	h.AddHostsEntry(host)
+	h.AddEntry(host)
 
 	// Reset the offset after AddHostsEntry changes it.
 	scanner := bufio.NewScanner(f)
@@ -58,7 +58,7 @@ func TestRemoveHostsEntry(t *testing.T) {
 	defer remove(f)
 
 	h := Hostsfile{f.Name(), f}
-	h.RemoveHostsEntry(host)
+	h.RemoveEntry(host)
 
 	scanner := bufio.NewScanner(f)
 
@@ -83,10 +83,10 @@ func TestListHostsEntries(t *testing.T) {
 
 	h := Hostsfile{f.Name(), f}
 
-	h.AddHostsEntry(host1)
-	h.AddHostsEntry(host2)
+	h.AddEntry(host1)
+	h.AddEntry(host2)
 
-	hosts := h.ListHostsEntries()
+	hosts := h.ListEntries()
 
 	if len(hosts) != 2 {
 		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
