@@ -28,7 +28,7 @@ func remove(f *os.File) error {
 	return os.Remove(f.Name())
 }
 
-func TestAddHostsEntry(t *testing.T) {
+func TestAddEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
 	host := NewHost(hostname, ip)
 
@@ -50,7 +50,7 @@ func TestAddHostsEntry(t *testing.T) {
 	t.Error(fmt.Sprintf("Expected to find %s in testdata/hosts", hostname))
 }
 
-func TestRemoveHostsEntry(t *testing.T) {
+func TestRemoveEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
 	host := NewHost(hostname, ip)
 
@@ -71,7 +71,7 @@ func TestRemoveHostsEntry(t *testing.T) {
 	t.Error(fmt.Sprintf("Expected to find %s in testdata/hosts", hostname))
 }
 
-func TestListHostsEntries(t *testing.T) {
+func TestListEntries(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
 	host1 := NewHost(hostname1, ip1)
 
