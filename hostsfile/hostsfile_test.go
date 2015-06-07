@@ -71,6 +71,24 @@ func TestRemoveEntry(t *testing.T) {
 	t.Error(fmt.Sprintf("Expected to find %s in testdata/hosts", hostname))
 }
 
+func TestFindEntry(t *testing.T) {
+	hostname, ip := "dev1.dev", "192.168.0.1"
+	host := NewHost(hostname, ip)
+
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+
+	h.AddEntry(host)
+
+	entry := h.FindEntry(hostname)
+
+	if entry == nil {
+		t.Error(fmt.Sprintf("Unable to find host entry %s.", hostname))
+	}
+}
+
 func TestListEntries(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
 	host1 := NewHost(hostname1, ip1)

@@ -83,6 +83,19 @@ func (h *Hostsfile) RemoveEntry(host *Host) {
 	}
 }
 
+func (h *Hostsfile) FindEntry(hostname string) *Host {
+	entries := h.ListEntries()
+
+	for _, entry := range entries {
+		if entry.Hostname == hostname {
+			return entry
+		}
+	}
+
+	return nil
+
+}
+
 func (h *Hostsfile) ListEntries() []*Host {
 	defer h.File.Seek(0, 0)
 
