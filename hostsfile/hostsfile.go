@@ -99,21 +99,23 @@ func (h *Hostsfile) FindEntry(hostname string) *Host {
 func (h *Hostsfile) ListEntries() []*Host {
 	defer h.File.Seek(0, 0)
 
-	reader := csv.NewReader(h.File)
-	tab, _ := utf8.DecodeRuneInString("\t")
-	comment, _ := utf8.DecodeRuneInString("#")
+	const ipIndex = 0
+	const hostnameIndex = 1
+	const idIndex = 2
 
-	reader.Comma = tab
-	reader.Comment = comment
+	reader := csv.NewReader(h.File)
+	reader.Comma, _ = utf8.DecodeRuneInString("\t")
+	reader.Comment, _ = utf8.DecodeRuneInString("#")
 	reader.FieldsPerRecord = -1
 
 	lines, _ := reader.ReadAll()
 
-	hosts := []*Host{}
+	hosts := make([]*Host, 0)
 
 	for _, line := range lines {
-		// TODO: Add a check to determine if the entry was added by hostsup
-		if len(line) >= 3 {
+		// Verify that the line contains the entryTag. Hostsup entries will
+		// always have 3 columns.
+		if len(line) >= 3 && strings.Contains(line[idIndex], entryTag) {
 			// TODO: See if we can unpack the list to create the Host
 			// host.NewHost(line...)
 			host := NewHost(line[1], line[0])
