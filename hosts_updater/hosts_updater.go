@@ -21,14 +21,22 @@ func handleError(err error) {
 	panic(err)
 }
 
-func NewHostsfile(filename string) *Hostsfile {
-	f, err := os.OpenFile(filename, os.O_RDWR, 0666)
+func NewHostsfile(filename string, ro ...bool) (*Hostsfile, error) {
+	var f *os.File
+	var err error
 
-	if err != nil {
-		handleError(err)
+	if len(ro) > 0 && ro[0] == true {
+		f, err = os.OpenFile(filename, os.O_RDONLY, 0666)
+
+	} else {
+		f, err = os.OpenFile(filename, os.O_RDWR, 0666)
 	}
 
-	return &Hostsfile{filename, f}
+	if err != nil {
+		return nil, err
+	}
+
+	return &Hostsfile{filename, f}, nil
 }
 
 func (h *Hostsfile) Close() error {
