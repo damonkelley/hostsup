@@ -25,6 +25,7 @@ func NewHostsfile(filename string, ro ...bool) (*Hostsfile, error) {
 	var f *os.File
 	var err error
 
+	// Determine if the hosts file should opened as read only or not.
 	if len(ro) > 0 && ro[0] == true {
 		f, err = os.OpenFile(filename, os.O_RDONLY, 0666)
 
@@ -39,6 +40,7 @@ func NewHostsfile(filename string, ro ...bool) (*Hostsfile, error) {
 	return &Hostsfile{filename, f}, nil
 }
 
+// Close the hostsfile.
 func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
