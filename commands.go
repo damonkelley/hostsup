@@ -41,29 +41,31 @@ func cmdAddEntry(c *cli.Context) {
 	hostname := c.Args().Get(1)
 	ip := c.Args().First()
 
-	h, err := hosts_updater.NewHostsfile(HOSTSFILE)
+	h, err := hostsfile.NewHostsfile(HOSTSFILE)
 	handleHostsfileError(err)
 
-	host := hosts_updater.NewHost(hostname, ip)
+	host := hostsfile.NewHost(hostname, ip)
 	h.AddEntry(host)
 }
 
 func cmdRemoveEntry(c *cli.Context) {
 	hostname := c.Args().First()
 
-	h, err := hosts_updater.NewHostsfile(HOSTSFILE)
+	h, err := hostsfile.NewHostsfile(HOSTSFILE)
 	handleHostsfileError(err)
 
-	host := hosts_updater.NewHost(hostname, "")
+	host := hostsfile.NewHost(hostname, "")
+	entry := h.FindEntry(hostname)
 
-	// TODO: Add a FindHost struct method to find an create a Host by the hostname.
-	// Then use the returned host as a parameter to RemoveEntry.
+	if entry == nil {
+		log.Fatalf("Unable to find a hosts entry with a hostname %s", hostname)
+	}
+
 	h.RemoveEntry(host)
-
 }
 
 func cmdListEntry(c *cli.Context) {
-	h, _ := hosts_updater.NewHostsfile(HOSTSFILE, true)
+	h, _ := hostsfile.NewHostsfile(HOSTSFILE, true)
 	entries := h.ListEntries()
 
 	w := tabwriter.NewWriter(os.Stdout, 5, 1, 3, ' ', 0)
@@ -77,7 +79,7 @@ func cmdListEntry(c *cli.Context) {
 }
 
 func cmdClean(c *cli.Context) {
-	h, err := hosts_updater.NewHostsfile(HOSTSFILE)
+	h, err := hostsfile.NewHostsfile(HOSTSFILE)
 	handleHostsfileError(err)
 
 	entries := h.Clean()
