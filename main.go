@@ -4,12 +4,11 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/damonkelley/hostsup/commands"
 )
 
 func main() {
 	app := cli.NewApp()
-	app.Commands = commands.Commands
+	app.Commands = Commands
 
 	app.Run(os.Args)
 }

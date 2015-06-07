@@ -1,4 +1,4 @@
-package commands
+package main
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	"github.com/damonkelley/hostsup/hosts_updater"
+	"github.com/damonkelley/hostsup/hostsfile"
 )
 
 var Commands = []cli.Command{
