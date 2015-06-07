@@ -5,7 +5,6 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
 	"github.com/damonkelley/hostsup/hostsfile"
 )
@@ -32,8 +31,6 @@ var Commands = []cli.Command{
 		Action: cmdClean,
 	},
 }
-
-var log = logrus.New()
 
 const HOSTSFILE string = "/etc/hosts"
 
