@@ -42,7 +42,11 @@ func cmdAddEntry(c *cli.Context) {
 	handleHostsfileError(err)
 
 	host := hostsfile.NewHost(ip, hostname)
-	h.AddEntry(host)
+	err = h.AddEntry(host)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func cmdRemoveEntry(c *cli.Context) {
@@ -54,10 +58,15 @@ func cmdRemoveEntry(c *cli.Context) {
 	entry := h.FindEntry(hostname)
 
 	if entry == nil {
-		log.Fatalf("Unable to find a hosts entry with a hostname %s", hostname)
+		log.Infof("Unable to find a hosts entry with a hostname %s", hostname)
+		os.Exit(0)
 	}
 
-	h.RemoveEntry(entry)
+	err = h.RemoveEntry(entry)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func cmdListEntry(c *cli.Context) {
