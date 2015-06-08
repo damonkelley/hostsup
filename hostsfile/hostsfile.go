@@ -2,6 +2,7 @@ package hostsfile
 
 import (
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,10 +16,6 @@ const entryTag string = "HOSTSUP"
 type Hostsfile struct {
 	Filename string
 	File     *os.File
-}
-
-func handleError(err error) {
-	panic(err)
 }
 
 func NewHostsfile(filename string, ro ...bool) (*Hostsfile, error) {
@@ -45,7 +42,7 @@ func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
-func (h *Hostsfile) AddEntry(host *Host) {
+func (h *Hostsfile) AddEntry(host *Host) error {
 	defer h.File.Seek(0, 0)
 
 	// Go the end of the file to append the new host entry.
@@ -54,17 +51,19 @@ func (h *Hostsfile) AddEntry(host *Host) {
 	entry := fmt.Sprintf(entryTemplate, host.IP, host.Hostname, host.Id)
 
 	if _, err := h.File.WriteString(entry); err != nil {
-		handleError(err)
+		return errors.New("Unable to write entry to hosts file.")
 	}
+
+	return nil
 }
 
-func (h *Hostsfile) RemoveEntry(host *Host) {
+func (h *Hostsfile) RemoveEntry(host *Host) error {
 	defer h.File.Seek(0, 0)
 
 	f, err := ioutil.ReadAll(h.File)
 
 	if err != nil {
-		handleError(err)
+		return errors.New("Unable to read hosts file.")
 	}
 
 	lines := strings.Split(string(f), "\n")
@@ -81,8 +80,10 @@ func (h *Hostsfile) RemoveEntry(host *Host) {
 	err = ioutil.WriteFile(h.Filename, []byte(output), 0666)
 
 	if err != nil {
-		handleError(err)
+		return errors.New("Unable to remove entry from hosts file.")
 	}
+
+	return nil
 }
 
 func (h *Hostsfile) FindEntry(hostname string) *Host {
