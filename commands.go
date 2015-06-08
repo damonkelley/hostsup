@@ -102,6 +102,6 @@ func handleHostsfileError(err error) {
 	}
 
 	if os.IsPermission(err) {
-		log.Fatal("You do not have permission to edit this file. Try reissueing the command with sudo.")
+		log.Fatal("You do not have permission to edit this file. Try reissuing the command with sudo.")
 	}
 }
