@@ -28,7 +28,7 @@ func remove(f *os.File) error {
 	return os.Remove(f.Name())
 }
 
-func TestAddEntry(t *testing.T) {
+func TestAddEntryAddsEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
 	host := NewHost(ip, hostname)
 
@@ -50,7 +50,7 @@ func TestAddEntry(t *testing.T) {
 	t.Error(fmt.Sprintf("Expected to find %s in testdata/hosts", hostname))
 }
 
-func TestRemoveEntry(t *testing.T) {
+func TestRemoveEntryRemovesEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
 	host := NewHost(ip, hostname)
 
@@ -71,7 +71,7 @@ func TestRemoveEntry(t *testing.T) {
 	t.Error(fmt.Sprintf("Expected to find %s in testdata/hosts", hostname))
 }
 
-func TestFindEntry(t *testing.T) {
+func TestFindEntryFindsEntry(t *testing.T) {
 	hostname, ip := "dev1.dev", "192.168.0.1"
 	host := NewHost(ip, hostname)
 
@@ -89,7 +89,7 @@ func TestFindEntry(t *testing.T) {
 	}
 }
 
-func TestListEntries(t *testing.T) {
+func TestListEntriesReturnsEntries(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
 	host1 := NewHost(ip1, hostname1)
 
@@ -109,6 +109,10 @@ func TestListEntries(t *testing.T) {
 	if len(hosts) != 2 {
 		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
 	}
+}
+
+func TestListEntriesReturnsNoEntries(t *testing.T) {
+
 }
 
 func TestClean(t *testing.T) {
