@@ -41,7 +41,7 @@ func cmdAddEntry(c *cli.Context) {
 	h, err := hostsfile.NewHostsfile(HOSTSFILE)
 	handleHostsfileError(err)
 
-	host := hostsfile.NewHost(hostname, ip)
+	host := hostsfile.NewHost(ip, hostname)
 	h.AddEntry(host)
 }
 

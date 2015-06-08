@@ -30,7 +30,7 @@ func remove(f *os.File) error {
 
 func TestAddEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
-	host := NewHost(hostname, ip)
+	host := NewHost(ip, hostname)
 
 	f, _ := createTestHostsFile()
 	defer remove(f)
@@ -52,7 +52,7 @@ func TestAddEntry(t *testing.T) {
 
 func TestRemoveEntry(t *testing.T) {
 	hostname, ip := "dev.dev", "192.168.0.1"
-	host := NewHost(hostname, ip)
+	host := NewHost(ip, hostname)
 
 	f, _ := createTestHostsFile()
 	defer remove(f)
@@ -73,7 +73,7 @@ func TestRemoveEntry(t *testing.T) {
 
 func TestFindEntry(t *testing.T) {
 	hostname, ip := "dev1.dev", "192.168.0.1"
-	host := NewHost(hostname, ip)
+	host := NewHost(ip, hostname)
 
 	f, _ := createTestHostsFile()
 	defer remove(f)
@@ -91,10 +91,10 @@ func TestFindEntry(t *testing.T) {
 
 func TestListEntries(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
-	host1 := NewHost(hostname1, ip1)
+	host1 := NewHost(ip1, hostname1)
 
 	hostname2, ip2 := "dev2.dev", "192.168.0.2"
-	host2 := NewHost(hostname2, ip2)
+	host2 := NewHost(ip2, hostname2)
 
 	f, _ := createTestHostsFile()
 	defer remove(f)
@@ -113,10 +113,10 @@ func TestListEntries(t *testing.T) {
 
 func TestClean(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
-	host1 := NewHost(hostname1, ip1)
+	host1 := NewHost(ip1, hostname1)
 
 	hostname2, ip2 := "dev2.dev", "192.168.0.2"
-	host2 := NewHost(hostname2, ip2)
+	host2 := NewHost(ip2, hostname2)
 
 	f, _ := createTestHostsFile()
 	defer remove(f)

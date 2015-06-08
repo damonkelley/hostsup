@@ -118,9 +118,7 @@ func (h *Hostsfile) ListEntries() []*Host {
 		// Verify that the line contains the entryTag. Hostsup entries will
 		// always have 3 columns.
 		if len(line) >= 3 && strings.Contains(line[idIndex], entryTag) {
-			// TODO: See if we can unpack the list to create the Host
-			// host.NewHost(line...)
-			host := NewHost(line[1], line[0])
+			host := NewHost(line[ipIndex], line[hostnameIndex])
 			hosts = append(hosts, host)
 		}
 	}

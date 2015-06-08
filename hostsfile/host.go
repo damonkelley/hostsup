@@ -6,13 +6,13 @@ import (
 )
 
 type Host struct {
-	Id, Hostname, IP string
+	IP, Hostname, Id string
 }
 
-func NewHost(hostname, ip string) *Host {
+func NewHost(ip, hostname string) *Host {
 	id := createHostId(hostname)
 
-	return &Host{id, hostname, ip}
+	return &Host{ip, hostname, id}
 }
 
 func createHostId(hostname string) string {
