@@ -11,17 +11,27 @@ import (
 
 func createTestHostsFile() (*os.File, error) {
 	f, err := ioutil.TempFile("testdata", "hosts-")
+	defer f.Seek(0, 0)
 
 	if err != nil {
 		return nil, err
 	}
 
 	contents, _ := ioutil.ReadFile("testdata/hosts")
-
 	f.Write(contents)
-	f.Seek(0, 0)
 
 	return f, nil
+}
+
+func convertToReadOnlyHostsFile(f *os.File) (*os.File, error) {
+	f.Close()
+	f, err := os.OpenFile(f.Name(), os.O_RDONLY, 0666)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return f, err
 }
 
 func remove(f *os.File) error {
@@ -43,11 +53,27 @@ func TestAddEntryAddsEntry(t *testing.T) {
 
 	for scanner.Scan() {
 		if strings.Contains(scanner.Text(), "dev.dev") {
-			return
+			return // Return as soon as we match the hostname.
 		}
 	}
 
 	t.Error(fmt.Sprintf("Expected to find %s in testdata/hosts", hostname))
+}
+
+func TestAddEntryReturnsError(t *testing.T) {
+	hostname, ip := "dev.dev", "192.168.0.1"
+	host := NewHost(ip, hostname)
+
+	f, _ := createTestHostsFile()
+	f, _ = convertToReadOnlyHostsFile(f)
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+	err := h.AddEntry(host)
+
+	if err == nil {
+		t.Error("Expected an error to be returned from AddEntry.")
+	}
 }
 
 func TestRemoveEntryRemovesEntry(t *testing.T) {
@@ -58,6 +84,7 @@ func TestRemoveEntryRemovesEntry(t *testing.T) {
 	defer remove(f)
 
 	h := Hostsfile{f.Name(), f}
+	h.AddEntry(host)
 	h.RemoveEntry(host)
 
 	scanner := bufio.NewScanner(f)
@@ -69,6 +96,24 @@ func TestRemoveEntryRemovesEntry(t *testing.T) {
 	}
 
 	t.Error(fmt.Sprintf("Expected to find %s in testdata/hosts", hostname))
+}
+
+func TestRemoveEntryReturnsError(t *testing.T) {
+	hostname, ip := "dev.dev", "192.168.0.1"
+	host := NewHost(ip, hostname)
+
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+	h.AddEntry(host)
+
+	f, _ = convertToReadOnlyHostsFile(f)
+	err := h.RemoveEntry(host)
+
+	if err == nil {
+		t.Error("Expected an error to be returned from RemoveEntry.")
+	}
 }
 
 func TestFindEntryFindsEntry(t *testing.T) {
@@ -89,7 +134,20 @@ func TestFindEntryFindsEntry(t *testing.T) {
 	}
 }
 
-func TestListEntriesReturnsEntries(t *testing.T) {
+func TestFindEntryDoesNotFindsEntry(t *testing.T) {
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+
+	entry := h.FindEntry("dev.dev")
+
+	if entry != nil {
+		t.Error(fmt.Sprintf("Unexpectedly found a host entry."))
+	}
+}
+
+func TestGetEntriesReturnsEntries(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
 	host1 := NewHost(ip1, hostname1)
 
@@ -106,16 +164,45 @@ func TestListEntriesReturnsEntries(t *testing.T) {
 
 	hosts := h.GetEntries()
 
-	if len(hosts) != 2 {
-		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
+	if numHosts := len(hosts); numHosts != 2 {
+		t.Error(fmt.Sprintf("Expected to find 2 host entries. Found %d instead.", numHosts))
+	}
+}
+
+func TestGetEntriesReturnsDuplicateEntries(t *testing.T) {
+	hostname, ip := "dev.dev", "192.168.0.1"
+	host := NewHost(ip, hostname)
+
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+
+	h.AddEntry(host)
+	h.AddEntry(host)
+	h.AddEntry(host)
+
+	hosts := h.GetEntries()
+
+	if numHosts := len(hosts); numHosts != 3 {
+		t.Error(fmt.Sprintf("Expected to find 3 host entries. Found %d instead.", numHosts))
 	}
 }
 
 func TestListEntriesReturnsNoEntries(t *testing.T) {
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+	hosts := h.GetEntries()
+
+	if numHosts := len(hosts); numHosts != 0 {
+		t.Error(fmt.Sprintf("Expected to find 0 host entries. Found %d instead.", numHosts))
+	}
 
 }
 
-func TestClean(t *testing.T) {
+func TestCleanReturnsAllEntries(t *testing.T) {
 	hostname1, ip1 := "dev1.dev", "192.168.0.1"
 	host1 := NewHost(ip1, hostname1)
 
@@ -135,5 +222,19 @@ func TestClean(t *testing.T) {
 
 	if len(hosts) != 0 {
 		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
+	}
+}
+
+func TestCleanWithNoEntries(t *testing.T) {
+	f, _ := createTestHostsFile()
+	defer remove(f)
+
+	h := Hostsfile{f.Name(), f}
+
+	h.Clean()
+	hosts := h.GetEntries()
+
+	if numHosts := len(hosts); numHosts != 0 {
+		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", numHosts))
 	}
 }
