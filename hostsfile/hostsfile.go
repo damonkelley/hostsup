@@ -38,13 +38,12 @@ func NewHostsfile(filename string, ro ...bool) (*Hostsfile, error) {
 	return &Hostsfile{filename, f}, nil
 }
 
-// Close the hostsfile.
+// Close the hosts file.
 func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
-// Add a new entry to the hosts file. The entry resembles:
-// <IP Address>	<hostname>	# HOSTSUP <md5 sum>
+// Add a new entry to the hosts file.
 func (h *Hostsfile) AddEntry(host *Host) error {
 	defer h.File.Seek(0, 0)
 
