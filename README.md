@@ -55,6 +55,7 @@ myhost.dev   192.168.0.1
 
 $ sudo hostsup rm myhost.dev
 INFO[0000] Removed "192.168.0.1 myhost.dev" from /etc/hosts.
+```
 
 ## Warning
 This tool edits an important file on your machine. Use at your own risk.
