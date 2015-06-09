@@ -11,6 +11,7 @@ var log = logrus.New()
 
 func main() {
 	app := cli.NewApp()
+	app.Usage = "A tool to easily manage your hosts file."
 	app.Commands = Commands
 	app.CommandNotFound = cmdNotFound
 	app.Version = Version
