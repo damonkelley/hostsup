@@ -87,7 +87,7 @@ func (h *Hostsfile) RemoveEntry(host *Host) error {
 }
 
 func (h *Hostsfile) FindEntry(hostname string) *Host {
-	entries := h.ListEntries()
+	entries := h.GetEntries()
 
 	for _, entry := range entries {
 		if entry.Hostname == hostname {
@@ -99,7 +99,7 @@ func (h *Hostsfile) FindEntry(hostname string) *Host {
 
 }
 
-func (h *Hostsfile) ListEntries() []*Host {
+func (h *Hostsfile) GetEntries() []*Host {
 	defer h.File.Seek(0, 0)
 
 	const ipIndex = 0
@@ -128,7 +128,7 @@ func (h *Hostsfile) ListEntries() []*Host {
 }
 
 func (h *Hostsfile) Clean() []*Host {
-	entries := h.ListEntries()
+	entries := h.GetEntries()
 
 	for _, entry := range entries {
 		h.RemoveEntry(entry)

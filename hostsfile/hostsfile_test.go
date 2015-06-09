@@ -104,7 +104,7 @@ func TestListEntriesReturnsEntries(t *testing.T) {
 	h.AddEntry(host1)
 	h.AddEntry(host2)
 
-	hosts := h.ListEntries()
+	hosts := h.GetEntries()
 
 	if len(hosts) != 2 {
 		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
@@ -131,7 +131,7 @@ func TestClean(t *testing.T) {
 	h.AddEntry(host2)
 
 	h.Clean()
-	hosts := h.ListEntries()
+	hosts := h.GetEntries()
 
 	if len(hosts) != 0 {
 		t.Error(fmt.Sprintf("Expected to find 2 host entry. Found %d instead.", len(hosts)))
