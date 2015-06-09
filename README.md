@@ -1,6 +1,6 @@
 # hostsup
 
-A tool for easily managing your hosts file.
+A tool to easily manage your hosts file
 
 ## Installation
 
