@@ -18,6 +18,7 @@ type Hostsfile struct {
 	File     *os.File
 }
 
+// Instantiate a new Hostsfile.
 func NewHostsfile(filename string, ro ...bool) (*Hostsfile, error) {
 	var f *os.File
 	var err error
@@ -42,6 +43,8 @@ func (h *Hostsfile) Close() error {
 	return h.File.Close()
 }
 
+// Add a new entry to the hosts file. The entry resembles:
+// <IP Address>	<hostname>	# HOSTSUP <md5 sum>
 func (h *Hostsfile) AddEntry(host *Host) error {
 	defer h.File.Seek(0, 0)
 
@@ -57,26 +60,31 @@ func (h *Hostsfile) AddEntry(host *Host) error {
 	return nil
 }
 
+// Remove an entry from the hosts file.
 func (h *Hostsfile) RemoveEntry(host *Host) error {
 	defer h.File.Seek(0, 0)
 
+	// Read the contents of the hosts file.
 	f, err := ioutil.ReadAll(h.File)
 
 	if err != nil {
 		return errors.New("Unable to read hosts file.")
 	}
 
+	// Explode the contents into a slice by line. Create an empty slice for
+	// the modified file contents.
 	lines := strings.Split(string(f), "\n")
 	updatedLines := []string{}
 
+	// Filter out any lines of the file that contain the Host ID.
 	for _, line := range lines {
 		if !strings.Contains(line, host.Id) {
 			updatedLines = append(updatedLines, line)
 		}
 	}
 
+	// Implode the lines and write them back to the file.
 	output := strings.Join(updatedLines, "\n")
-
 	err = ioutil.WriteFile(h.Filename, []byte(output), 0666)
 
 	if err != nil {
@@ -86,6 +94,7 @@ func (h *Hostsfile) RemoveEntry(host *Host) error {
 	return nil
 }
 
+// Find the first host entry that matches a hostname.
 func (h *Hostsfile) FindEntry(hostname string) *Host {
 	entries := h.GetEntries()
 
@@ -96,23 +105,27 @@ func (h *Hostsfile) FindEntry(hostname string) *Host {
 	}
 
 	return nil
-
 }
 
+// Get a list of all the host entries that were added. This will exclude any
+// entry that was not added by AddEntry().
 func (h *Hostsfile) GetEntries() []*Host {
 	defer h.File.Seek(0, 0)
 
-	const ipIndex = 0
-	const hostnameIndex = 1
-	const idIndex = 2
+	var (
+		ipIndex       = 0
+		hostnameIndex = 1
+		idIndex       = 2
+	)
 
+	// Set up the Reader for a tab delimited file.
 	reader := csv.NewReader(h.File)
 	reader.Comma, _ = utf8.DecodeRuneInString("\t")
 	reader.Comment, _ = utf8.DecodeRuneInString("#")
 	reader.FieldsPerRecord = -1
 
+	// Get all lines. Sets lines to [][]string.
 	lines, _ := reader.ReadAll()
-
 	hosts := make([]*Host, 0)
 
 	for _, line := range lines {
@@ -127,6 +140,7 @@ func (h *Hostsfile) GetEntries() []*Host {
 	return hosts
 }
 
+// Remove all entries added by AddEntries.
 func (h *Hostsfile) Clean() []*Host {
 	entries := h.GetEntries()
 
