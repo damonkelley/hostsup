@@ -35,8 +35,8 @@ var Commands = []cli.Command{
 const fileName string = "/etc/hosts"
 
 // Format strings for the logger.
-const addFormat = "Added \"%s\t%s\" to %s."
-const removeFormat = "Removed \"%s\t%s\" from %s."
+const addFormat = "Added \"%s %s\" to %s."
+const removeFormat = "Removed \"%s %s\" from %s."
 
 // Command to add an entry to the hosts file.
 func cmdAddEntry(c *cli.Context) {
