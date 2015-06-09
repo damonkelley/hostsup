@@ -35,8 +35,9 @@ var Commands = []cli.Command{
 const HOSTSFILE string = "/etc/hosts"
 
 func cmdAddEntry(c *cli.Context) {
-	hostname := c.Args().Get(1)
+	// Argument order is: <IP>, <hostname>.
 	ip := c.Args().First()
+	hostname := c.Args().Get(1)
 
 	h, err := hostsfile.NewHostsfile(HOSTSFILE)
 	handleHostsfileError(err)
@@ -57,6 +58,9 @@ func cmdRemoveEntry(c *cli.Context) {
 
 	entry := h.FindEntry(hostname)
 
+	// If the entry cannot be found, inform the user and exit gracefully.
+	// Not providing the queried hostname should not produce a non-zero exit code,
+	// but execution should stop here.
 	if entry == nil {
 		log.Infof("Unable to find a hosts entry with a hostname %s", hostname)
 		os.Exit(0)
@@ -69,9 +73,10 @@ func cmdRemoveEntry(c *cli.Context) {
 	}
 }
 
+// Command to list all entries added by hostsup.
 func cmdListEntry(c *cli.Context) {
 	h, _ := hostsfile.NewHostsfile(HOSTSFILE, true)
-	entries := h.ListEntries()
+	entries := h.GetEntries()
 
 	w := tabwriter.NewWriter(os.Stdout, 5, 1, 3, ' ', 0)
 	fmt.Fprintln(w, "HOSTNAME\tIP")
@@ -83,6 +88,7 @@ func cmdListEntry(c *cli.Context) {
 	w.Flush()
 }
 
+// Command to remove all entries added by hostsup.
 func cmdClean(c *cli.Context) {
 	h, err := hostsfile.NewHostsfile(HOSTSFILE)
 	handleHostsfileError(err)
@@ -96,6 +102,7 @@ func cmdClean(c *cli.Context) {
 	log.Info("Hosts file has been cleaned.")
 }
 
+// Report the correct error if the hosts file was not able to be opened.
 func handleHostsfileError(err error) {
 	if os.IsNotExist(err) {
 		log.Fatalf("The file %s does not exists on your system.", HOSTSFILE)
