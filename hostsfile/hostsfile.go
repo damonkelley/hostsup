@@ -10,7 +10,7 @@ import (
 	"unicode/utf8"
 )
 
-const entryTemplate string = "\n%s\t%s\t# HOSTSUP %s"
+const entryTemplate string = "%s\t%s\t# HOSTSUP %s\n"
 const entryTag string = "HOSTSUP"
 
 type Hostsfile struct {
